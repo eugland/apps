@@ -88,7 +88,7 @@
     <div class="wrap">
       <h2>See it in 12 seconds</h2>
       <p class="sub">A faster way to reach the sites you actually use.</p>
-      <video class="promo-video" controls playsinline preload="metadata" poster="images/promo-marquee-1400x560.png" aria-label="New Tab: More Recent Visited promotional video">
+      <video id="promoVideo" class="promo-video" controls playsinline preload="metadata" poster="images/promo-marquee-1400x560.png" aria-label="New Tab: More Recent Visited promotional video">
         <source src="images/new-tab-promo-dynamic-12s.mp4" type="video/mp4">
         Your browser does not support embedded video. <a href="images/new-tab-promo-dynamic-12s.mp4">Download the promo video</a>.
       </video>
@@ -145,5 +145,48 @@
       <p>© 2026 New Tab: More Recent Visited</p>
     </div>
   </footer>
+
+  <!-- Localized site assets: swap screenshots + demo video to the visitor's
+       language when a matching _locales set exists. English is the no-JS
+       default already in the markup, and every <img> falls back to it. -->
+  <script>
+  (function () {
+    var L = ["am","ar","bg","bn","ca","cs","da","de","el","en","es","et","fa","fi","fil","fr","gu","he","hi","hr","hu","id","it","ja","kn","ko","lt","lv","ml","mr","ms","nl","no","pl","pt_BR","pt_PT","ro","ru","sk","sl","sr","sv","sw","ta","te","th","tr","uk","vi","zh_CN","zh_TW"];
+    function pick() {
+      var cs = navigator.languages || [navigator.language || "en"];
+      for (var i = 0; i < cs.length; i++) {
+        var t = cs[i].replace("-", "_");
+        if (L.indexOf(t) >= 0) return t;
+        var base = t.split("_")[0];
+        if (base === "zh") return /TW|HK|Hant/i.test(t) ? "zh_TW" : "zh_CN";
+        if (base === "pt") return /BR/i.test(t) ? "pt_BR" : "pt_PT";
+        if (L.indexOf(base) >= 0) return base;
+      }
+      return "en";
+    }
+    var code = pick();
+    document.documentElement.lang = code.replace("_", "-");
+    var pfx = "images/i18n/" + code + "/";
+    // Screenshots: English keeps its curated root set; other locales swap.
+    if (code !== "en") {
+      var names = ["screenshot-1-overview.png","screenshot-2-ranking.png","screenshot-3-customize.png","screenshot-4-settings.png","screenshot-5-dark-private.png"];
+      var imgs = document.querySelectorAll("#screenshots .shot img");
+      for (var j = 0; j < imgs.length && j < names.length; j++) {
+        (function (img, fallback) {
+          img.onerror = function () { img.onerror = null; img.src = fallback; };
+          img.src = pfx + names[j];
+        })(imgs[j], imgs[j].src);
+      }
+    }
+    // Demo video: generated localized clip for every locale (incl. English).
+    var v = document.getElementById("promoVideo");
+    if (v) {
+      v.poster = pfx + "demo-poster.jpg";
+      v.innerHTML = '<source src="' + pfx + 'demo.webm" type="video/webm">'
+                  + '<source src="' + pfx + 'demo.mp4" type="video/mp4">';
+      v.load();
+    }
+  })();
+  </script>
 </body>
 </html>
