@@ -33,9 +33,12 @@
     h1{font-size:clamp(2.1rem,6vw,3.4rem);line-height:1.05;letter-spacing:-.04em;margin:0 0 16px}
     .lead{color:var(--muted);font-size:clamp(1.05rem,2.5vw,1.3rem);max-width:620px;margin:0 auto}
     .cta{margin-top:32px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-    .btn{display:inline-block;padding:12px 22px;border-radius:999px;font-weight:600}
-    .btn.primary{background:var(--accent);color:#fff}
-    @media(prefers-color-scheme:dark){.btn.primary{color:#202124}}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:12px 22px;border-radius:999px;font-weight:600;text-decoration:none}
+    .btn.primary{background:var(--accent);color:#fff;padding:17px 36px;font-size:1.08rem;font-weight:700;letter-spacing:.2px;box-shadow:0 8px 24px rgba(26,115,232,.35);transition:transform .14s ease,box-shadow .14s ease}
+    .btn.primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(26,115,232,.45)}
+    .btn.primary:active{transform:translateY(0)}
+    .btn.primary svg{flex:0 0 auto}
+    @media(prefers-color-scheme:dark){.btn.primary{color:#202124;box-shadow:0 8px 24px rgba(138,180,248,.28)}.btn.primary:hover{box-shadow:0 12px 30px rgba(138,180,248,.4)}}
     .btn.ghost{border:1px solid var(--border);background:var(--surface);color:var(--ink)}
 
     /* Demo video */
@@ -78,15 +81,19 @@
       <h1>New Tab:<br>More Recent Visited</h1>
       <p class="lead">A clean Chrome new tab that automatically ranks the websites you visit most frequently and recently—computed entirely on your device.</p>
       <div class="cta">
-        <a class="btn primary" href="https://chromewebstore.google.com/detail/new-tab-more-recent-visit/jmejngpjngbinoebfecfbacjieffjjhm" target="_blank" rel="noopener">Add to Chrome</a>
-        <a class="btn ghost" href="#demo">Watch the 12-second demo</a>
+        <a class="btn primary" href="https://chromewebstore.google.com/detail/new-tab-more-recent-visit/jmejngpjngbinoebfecfbacjieffjjhm" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Add to Chrome — Free
+        </a>
       </div>
     </div>
   </header>
 
   <section class="demo" id="demo">
     <div class="wrap">
-      <h2>See it in 12 seconds</h2>
+      <h2>See it in action</h2>
       <p class="sub">A faster way to reach the sites you actually use.</p>
       <video id="promoVideo" class="promo-video" controls playsinline preload="metadata" poster="images/promo-marquee-1400x560.png" aria-label="New Tab: More Recent Visited promotional video">
         <source src="images/new-tab-promo-dynamic-12s.mp4" type="video/mp4">
@@ -167,16 +174,15 @@
     var code = pick();
     document.documentElement.lang = code.replace("_", "-");
     var pfx = "images/i18n/" + code + "/";
-    // Screenshots: English keeps its curated root set; other locales swap.
-    if (code !== "en") {
-      var names = ["screenshot-1-overview.png","screenshot-2-ranking.png","screenshot-3-customize.png","screenshot-4-settings.png","screenshot-5-dark-private.png"];
-      var imgs = document.querySelectorAll("#screenshots .shot img");
-      for (var j = 0; j < imgs.length && j < names.length; j++) {
-        (function (img, fallback) {
-          img.onerror = function () { img.onerror = null; img.src = fallback; };
-          img.src = pfx + names[j];
-        })(imgs[j], imgs[j].src);
-      }
+    // Screenshots: swap to the localized set for every locale (incl. English),
+    // falling back to the original markup src on error.
+    var names = ["screenshot-1-overview.png","screenshot-2-ranking.png","screenshot-3-customize.png","screenshot-4-settings.png","screenshot-5-dark-private.png"];
+    var imgs = document.querySelectorAll("#screenshots .shot img");
+    for (var j = 0; j < imgs.length && j < names.length; j++) {
+      (function (img, fallback) {
+        img.onerror = function () { img.onerror = null; img.src = fallback; };
+        img.src = pfx + names[j];
+      })(imgs[j], imgs[j].src);
     }
     // Demo video: generated localized clip for every locale (incl. English).
     var v = document.getElementById("promoVideo");
